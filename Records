@@ -1,0 +1,148 @@
+import java.io.*;
+import java.util.*;
+
+class Record {
+    int id;
+    String name;
+
+    Record(int id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+
+    public String toString() {
+        return id + "," + name;
+    }
+}
+
+public class Sora {
+    static ArrayList<Record> records = new ArrayList<>();
+    static final String FILE_NAME = "records.txt";
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+
+        loadFromFile();
+
+        while (true) {
+            System.out.println("\n1. Add");
+            System.out.println("2. View");
+            System.out.println("3. Update");
+            System.out.println("4. Delete");
+            System.out.println("5. Exit");
+
+            System.out.print("Choice: ");
+            int choice = sc.nextInt();
+
+            switch (choice) {
+                case 1:
+                    addRecord(sc);
+                    break;
+                case 2:
+                    viewRecords();
+                    break;
+                case 3:
+                    updateRecord(sc);
+                    break;
+                case 4:
+                    deleteRecord(sc);
+                    break;
+                case 5:
+                    return;
+                default:
+                    System.out.println("Invalid");
+            }
+        }
+    }
+
+    static void loadFromFile() {
+        try {
+            File file = new File(FILE_NAME);
+
+            if (!file.exists()) {
+                file.createNewFile();
+                return;
+            }
+
+            BufferedReader br = new BufferedReader(new FileReader(file));
+            String line;
+
+            while ((line = br.readLine()) != null) {
+                String[] data = line.split(",");
+                records.add(new Record(Integer.parseInt(data[0]), data[1]));
+            }
+
+            br.close();
+        } catch (Exception e) {
+            System.out.println("Error");
+        }
+    }
+
+    static void saveToFile() {
+        try {
+            FileWriter fw = new FileWriter(FILE_NAME);
+
+            for (Record r : records) {
+                fw.write(r + "\n");
+            }
+
+            fw.close();
+        } catch (Exception e) {
+            System.out.println("Error");
+        }
+    }
+
+    static void addRecord(Scanner sc) {
+        System.out.print("ID: ");
+        int id = sc.nextInt();
+        sc.nextLine();
+
+        System.out.print("Name: ");
+        String name = sc.nextLine();
+
+        records.add(new Record(id, name));
+        saveToFile();
+    }
+
+    static void viewRecords() {
+        if (records.size() == 0) {
+            System.out.println("Empty");
+            return;
+        }
+
+        for (int i = 0; i < records.size(); i++) {
+            Record r = records.get(i);
+            System.out.println(i + " - " + r.id + " " + r.name);
+        }
+    }
+
+    static void updateRecord(Scanner sc) {
+        viewRecords();
+
+        System.out.print("Index: ");
+        int i = sc.nextInt();
+        sc.nextLine();
+
+        if (i >= 0 && i < records.size()) {
+            System.out.print("New Name: ");
+            records.get(i).name = sc.nextLine();
+            saveToFile();
+        } else {
+            System.out.println("Invalid");
+        }
+    }
+
+    static void deleteRecord(Scanner sc) {
+        viewRecords();
+
+        System.out.print("Index: ");
+        int i = sc.nextInt();
+
+        if (i >= 0 && i < records.size()) {
+            records.remove(i);
+            saveToFile();
+        } else {
+            System.out.println("Invalid");
+        }
+    }
+}
